@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>mood melody</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/public/assets/styles/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <img src="/public/assets/views/logo.png" alt="logo" width="250">
+    <img src="/public/assets/views/pencil.png" alt="pencil" class="corner-icon top-right large-icon">
+    <img src="/public/assets/views/music-note.png" alt="music note" class="corner-icon bottom-left small-icon">   
+    <div class="container">
+        <p>add to your journal:</p>
+        <form id="journalForm">
+            <fieldset>
+                <label for="date">select today’s (or a past/future) date:</label><br>
+                <input type="date" id="date" name="date" required><br><br>
+        
+                <label for="title">entry title:</label><br>
+                <input type="text" id="title" name="title" placeholder="title..." required><br><br>
+        
+                <label for="entry">entry:</label><br>
+                <textarea id="entry" name="entry" rows="4" placeholder="write what's on your mind..." required></textarea><br><br>
+        
+                <button type="submit" class="form-button">save your entry</button>
+                <button type="button" class="form-button" id="cancel-button">cancel</button>
+            </fieldset>
+        </form>
+    </div>
+    <script>
+    $(document).ready(function () {
+        $('#journalForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const formData = {
+                title: $('#title').val(),
+                entry: $('#entry').val(),
+                date: $('#date').val()
+            };
+
+        $.ajax({
+            url: 'http://localhost:8888/api/diary',
+            type: 'POST',
+            data: formData,
+            success: function () {
+                alert("entry saved successfully!");
+                window.location.href = 'http://localhost:8888/entries/view';
+                },
+            error: function () {
+                alert("error saving entry. please check if you have an existing entry this day.");
+                }
+            });
+        });
+
+        $('#cancel-button').on('click', function () {
+        window.location.href = 'http://localhost:8888/entries/view';
+        });
+    });
+</script>
+</body>
+</html>

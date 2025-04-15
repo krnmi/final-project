@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>mood melody</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/public/assets/styles/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <img src="/public/assets/views/logo.png" alt="logo" width="250">
+    <img src="/public/assets/views/pencil.png" alt="pencil" class="corner-icon top-right large-icon">
+    <img src="/public/assets/views/music-note.png" alt="music note" class="corner-icon bottom-left small-icon">   
+    <div class="container">
+        <h2 id="delete-message">are you sure you want to delete this entry?</h2>
+        <div id="entry-details"></div>
+        <button id="confirm-delete" class="cancel-button">delete</button>
+        <a href="http://localhost:8888/entries/view" class="cancel-button">cancel</a>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            const parts = window.location.pathname.split("/");
+            const id = parts[parts.length - 1];
+
+            $.ajax({
+                url: `http://localhost:8888/api/entries/${id}`, 
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if(data) {
+                        $('#delete-message').text(`are you sure you want to delete the entry?`)
+                    }
+                },
+                error: function() {
+                    alert('Error fetching entries.');
+                }
+            });
+
+            $('#confirm-delete').click(function(){
+                if(confirm("this will permanently delete the entry. are you sure?")) {
+                    $.ajax({
+                        url: `http://localhost:8888/api/entries/${id}`,
+                        type: 'DELETE',
+                        success: function() {
+                            alert('entry deleted successfully!');
+                            window.location.href = 'http://localhost:8888/entries/view';
+                        },
+                        error: function() {
+                            alert('error deleting entry.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

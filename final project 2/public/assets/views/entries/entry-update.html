@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>mood melody</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/public/assets/styles/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <img src="/public/assets/views/pencil.png" alt="pencil" class="corner-icon top-right large-icon">
+    <img src="/public/assets/views/music-note.png" alt="music note" class="corner-icon bottom-left small-icon">   
+    <img src="/public/assets/views/logo.png" alt="logo" width="250">
+    <div class="container">
+        <p>edit your journal entry</p>
+        <form id="updateForm">
+            <fieldset>
+                <label for="date">select the date you are attempting to edit:</label><br>
+                <input type="date" id="date" name="date" required><br><br>
+        
+                <label for="title">edit title:</label><br>
+                <input type="text" id="title" name="title" placeholder="edit your title..." required><br><br>
+        
+                <label for="entry">journal entry:</label><br>
+                <textarea id="entry" name="entry" rows="4" placeholder="edit your entry..." required></textarea><br><br>
+        
+                <div class="button-container">
+                    <button type="submit">edit your entry</button>
+                    <a href="http://localhost:8888/entries/view" class="cancel-button">cancel</a>
+                </div>
+            </fieldset>
+        </form>        
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const parts = window.location.pathname.split("/");
+            const id = parts[parts.length - 1];
+            $.ajax({
+                url: `http://localhost:8888/api/entries/${id}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if (data) {
+                        $('#title').val(data.title);
+                        $('#date').val(data.date);
+                        $('#entry').val(data.entry);
+                    }
+                },
+                error: function() {
+                    alert('error fetching entry details.');
+                }
+            });
+
+            $('#updateForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const updatedData = {
+                    title: $('#title').val(),
+                    entry: $('#entry').val(),
+                    date: $('#date').val()
+                };
+                $.ajax({
+                    url: `http://localhost:8888/api/entries/${id}`, 
+                    type: 'PUT',
+                    data: JSON.stringify(updatedData),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function(response) {
+                        alert('entry updated successfully!');
+                        window.location.href = 'http://localhost:8888/entries/view';
+                    },
+                    error: function(xhr) {
+                        let errors;
+                        try {
+                            errors = JSON.parse(xhr.responseText);
+                        } catch(e) {
+                            errors = { error: "error updating entry." };
+                        }
+                        alert(JSON.stringify(errors));
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

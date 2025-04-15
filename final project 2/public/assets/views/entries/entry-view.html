@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>mood melody</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/public/assets/styles/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <img src="/public/assets/views/pencil.png" alt="pencil" class="corner-icon top-right large-icon">
+    <img src="/public/assets/views/music-note.png" alt="music note" class="corner-icon bottom-left small-icon">   
+    <img src="/public/assets/views/logo.png" alt="logo" width="400">
+    <div class="container">
+        <p>welcome to your journal, here are all your entries:</p>
+        <br>
+        <div id="entries-container"></div>
+        <a href="http://localhost:8888/entries/add">
+            <button class="add-entry-button">press here to add a new entry</button>
+        </a>
+    </div>
+
+
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: 'http://localhost:8888/api/diary',  
+                type: 'GET',
+                dataType: 'json',
+                success: function(entries) {
+                    entries.forEach(function(entry) {
+                        const entryBlock = `
+                            <div class="entry" data-id="${entry.id}">
+                                <h3>${entry.title}</h3>
+                                <p>date: ${entry.date}</p>
+                                <p>${entry.entry}</p>
+                                <div class="entry-buttons">
+                                    <a href="http://localhost:8888/entries/update/${entry.id}" class="entry-button">edit</a>
+                                    <a href="http://localhost:8888/entries/delete/${entry.id}" class="entry-button">delete</a>
+                                </div>
+                            </div>
+                        `;
+                        $("#entries-container").append(entryBlock);
+                    });
+                },
+                error: function() {
+                    alert('error fetching entries.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
